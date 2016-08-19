@@ -9,9 +9,10 @@ import classNames from 'classnames';
 
 const customModal = {
   overlay: {
-    zIndex: 2000,
+    zIndex: 1000,
   },
   content: {
+    position: 'absolute',
     width: '25%',
     height: '18%',
     top: '50%',

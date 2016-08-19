@@ -20,7 +20,9 @@ export default class DropdownTrigger extends Component {
           hideLabel={true}
           onClick={toggle}
           onKeyDown={toggle}
-          aria-haspopup={'true'}/>
+          aria-haspopup={'true'}
+          aria-labelledby={labelBtn + 'Label'}
+          aria-describedby={labelBtn + 'Desc'}/>
     );
   }
 }

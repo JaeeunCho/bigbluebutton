@@ -47,27 +47,6 @@ export default class SettingsDropdown extends Component {
                 icon: 'bbb-logout', }, tabIndex: 3, });
   }
 
-  componentDidMount() {
-    ReactDOM.render(
-      <div>
-        <p id="settingButton" className={styles.descModal}>Setting Menu</p>
-        <Button
-          style={{ transform: 'rotate(90deg)' }}
-          onClick={this.openMenu}
-          onKeyDown={this.openMenu}
-          icon={'more'}
-          role='button'
-          ghost={true}
-          circle={true}
-          hideLabel={true}
-          label={'Settings'}
-          aria-haspopup={'true'}
-          aria-labelledby={'settingButton'}
-          aria-describedby={'settingButton'}
-          />
-      </div>, document.getElementById('settingsButtonPlaceHolder'));
-  }
-
   // when dropdown is closed, set activeMenu to -1
   // if I don't, the focus is fixed at the last choice.
   componentWillUpdate() {
@@ -77,17 +56,15 @@ export default class SettingsDropdown extends Component {
   }
 
   handleListKeyDown(event) {
-    let code = event.keyCode;
+    const pressedKey = event.keyCode;
     let menusLength = this.menus.length - 1;
 
     // tab
-    if (code === 9) {
+    if (pressedKey === 9) {
       let newIndex = 0;
       if (this.state.focusMenu >= menusLength) {
-        // this.setState({ focusMenu: this.state.focusMenu - menusLength });
         newIndex = menusLength;
       } else {
-        // this.setState({ focusMenu: this.state.focusMenu + 1 });
         newIndex = this.state.focusMenu + 1;
       }
 
@@ -96,7 +73,7 @@ export default class SettingsDropdown extends Component {
     }
 
     // shift + tab
-    if (event.shiftKey && code === 9) {
+    if (event.shiftKey && pressedKey === 9) {
       let newIndex = 0;
       if (this.state.focusMenu <= 0) {
         newIndex = 0;
@@ -109,7 +86,7 @@ export default class SettingsDropdown extends Component {
     }
 
     // Up key
-    if (code === 38) {
+    if (pressedKey === 38) {
       if (this.state.focusMenu <= 0) { // checks if at end of menu
         this.setState({ focusMenu: menusLength },
            function () { ReactDOM.findDOMNode(this.refs[`menu${this.state.focusMenu}`]).focus();
@@ -123,7 +100,7 @@ export default class SettingsDropdown extends Component {
     }
 
     // Down key
-    if (code === 40) {
+    if (pressedKey === 40) {
       if (this.state.focusMenu >= menusLength) { // checks if at end of menu
         this.setState({ focusMenu: 0 },
            function () { ReactDOM.findDOMNode(this.refs[`menu${this.state.focusMenu}`]).focus();
@@ -137,7 +114,7 @@ export default class SettingsDropdown extends Component {
     }
 
     // Enter and SpaceBar
-    if (code === 13 || code === 32) {
+    if (pressedKey === 13 || pressedKey === 32) {
       this.clickMenu(this.state.focusMenu);
       return;
     }
@@ -194,34 +171,53 @@ export default class SettingsDropdown extends Component {
 
   render() {
     return (
-      <div style={{ clear: 'both', height: '100%' }} role='presentation'>
-        <p id="dropdownModal" className={styles.descModal}>Setting dropdown</p>
-        <Modal isOpen={this.state.isMenuOpen}
-              onRequestClose={this.closeMenu}
-              style={customStyles}
-              className={styles.settingsMenuLeft}
-              role="Settingmenu"
-              aria-labelledby="dropdownModal"
-              aria-describedby="dropdownModal">
-              <ul style={{ listStyleType: 'none', paddingLeft: '0px' }} role="menu">
-                {this.menus.map((value, index) => (
-                  <li key={index} role='menuitem'
-                    tabIndex={value.tabIndex}
-                    ref={'menu' + index}
-                    onClick={this.clickMenu.bind(this, index)}
-                    onKeyDown={this.handleListKeyDown.bind(this)}
-                    onFocus={this.handleFocus.bind(this, index)}
-                    aria-hidden={this.state.isMenuOpen ? true : false}
-                    className={styles.settingsMenuItem}>
-                    <Icon key={index} prependIconName={value.props.prependIconName}
-                      iconName={value.props.icon} title={value.props.title}/>
-                    <span className={styles.settingsMenuItemText}>{value.props.title}</span>
-                    {index == '0' ? <hr /> : null}
-                  </li>
-                ))}
-              </ul>
-        </Modal>
-        <div role='presentation'>{this.createMenu()}</div>
+      <div>
+        <div>
+          <p id="settingButton" className={styles.descModal}>Setting Menu</p>
+          <Button
+            className={styles.settingBtn}
+            onClick={this.openMenu}
+            onKeyDown={this.openMenu}
+            icon={'more'}
+            role='button'
+            ghost={true}
+            circle={true}
+            hideLabel={true}
+            label={'Settings'}
+            aria-haspopup={'true'}
+            aria-labelledby={'settingButton'}
+            aria-describedby={'settingButton'}
+            />
+        </div>
+        <div className={styles.divModal} role='presentation'>
+          <p id="dropdownModal" className={styles.descModal}>Setting dropdown</p>
+          <Modal isOpen={this.state.isMenuOpen}
+                onRequestClose={this.closeMenu}
+                style={customStyles}
+                className={styles.settingsMenuLeft}
+                role="Settingmenu"
+                aria-labelledby="dropdownModal"
+                aria-describedby="dropdownModal">
+                <ul className={styles.menuList} role="menu">
+                  {this.menus.map((value, index) => (
+                    <li key={index} role='menuitem'
+                      tabIndex={value.tabIndex}
+                      ref={'menu' + index}
+                      onClick={this.clickMenu.bind(this, index)}
+                      onKeyDown={this.handleListKeyDown.bind(this)}
+                      onFocus={this.handleFocus.bind(this, index)}
+                      aria-hidden={this.state.isMenuOpen ? true : false}
+                      className={styles.settingsMenuItem}>
+                      <Icon key={index} prependIconName={value.props.prependIconName}
+                        iconName={value.props.icon} title={value.props.title}/>
+                      <span className={styles.settingsMenuItemText}>{value.props.title}</span>
+                      {index == '0' ? <hr /> : null}
+                    </li>
+                  ))}
+                </ul>
+          </Modal>
+          <div role='presentation'>{this.createMenu()}</div>
+        </div>
       </div>
     );
   }

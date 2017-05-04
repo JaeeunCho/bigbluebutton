@@ -7,6 +7,7 @@ import Button from '/imports/ui/components/button/component';
 import cx from 'classnames';
 import { defineMessages, injectIntl } from 'react-intl';
 
+import ReactTooltip from 'react-tooltip';
 const FOCUSABLE_CHILDREN = `[tabindex]:not([tabindex="-1"]), a, input, button`;
 
 const intlMessages = defineMessages({
@@ -67,7 +68,7 @@ class Dropdown extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.isOpen !== this.props.isOpen
       && this.state.isOpen !== this.props.isOpen) {
-      this.setState({ isOpen: this.props.isOpen }, this.handleStateCallback);
+      this.setState({ isOpen: this.props.isOpen }, this.handleStateCallback, ()=> {ReactTooltip.rebuild();});
     }
   }
 
@@ -79,6 +80,7 @@ class Dropdown extends Component {
     } else if (onHide) {
       onHide();
     }
+
   }
 
   handleShow() {

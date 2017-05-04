@@ -167,3 +167,10 @@
     cursor: default;
   }
 }
+
+.tooltip {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 20% !important;
+}

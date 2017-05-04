@@ -9,6 +9,8 @@ import styles from './styles.scss';
 import cx from 'classnames';
 import _ from 'lodash';
 
+import ReactTooltip from 'react-tooltip';
+
 import Dropdown from '/imports/ui/components/dropdown/component';
 import DropdownTrigger from '/imports/ui/components/dropdown/trigger/component';
 import DropdownContent from '/imports/ui/components/dropdown/content/component';
@@ -94,6 +96,7 @@ class UserListItem extends Component {
     this.handleScroll = this.handleScroll.bind(this);
     this.onActionsShow = this.onActionsShow.bind(this);
     this.onActionsHide = this.onActionsHide.bind(this);
+    // this.renderTooltip = this.renderTooltip.bind(this);
   }
 
   handleScroll() {
@@ -230,14 +233,28 @@ class UserListItem extends Component {
     userItemContentsStyle[styles.userItemContentsCompact] = compact;
     userItemContentsStyle[styles.active] = this.state.isActionsOpen;
 
+    let disableTooltip;
+    disableTooltip = navigator.userAgent.indexOf('Mobile') == -1 ? false : true;
+
     return (
       <li
         role="button"
         aria-haspopup="true"
         aria-live="assertive"
         aria-relevant="additions"
-        className={cx(styles.userListItem, userItemContentsStyle)}>
+        className={cx(styles.userListItem, userItemContentsStyle)}
+        data-tip={this.props.user.name}
+        data-for={'userName'}>
         {this.renderUserContents()}
+        <ReactTooltip id={'userName'}
+                      event="mouseenter focusin"
+                      eventOff="mouseleave focusout"
+                      place="right"
+                      effect="solid"
+                      disable={disableTooltip}
+                      aria-haspopup='true'
+                      role='tooltip'
+                      className={styles.tooltip}/>
       </li>
     );
   }

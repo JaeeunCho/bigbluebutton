@@ -5,6 +5,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 import MessageForm from './message-form/component';
 import MessageList from './message-list/component';
 import Icon from '../icon/component';
+import ReactTooltip from 'react-tooltip';
 
 const ELEMENT_ID = 'chat-messages';
 
@@ -39,9 +40,11 @@ class Chat extends Component {
       intl,
     } = this.props;
 
+    let disableTooltip;
+    disableTooltip = navigator.userAgent.indexOf('Mobile') == -1 ? false : true;
+
     return (
       <div className={styles.chat}>
-
         <header className={styles.header}>
           <div className={styles.title}>
             <Link
@@ -51,6 +54,15 @@ class Chat extends Component {
                 <Icon iconName="left_arrow"/> {title}
             </Link>
           </div>
+          <ReactTooltip id='CloseChat'
+                        place="left"
+                        type="dark"
+                        effect="solid"
+                        disable={disableTooltip}
+                        event="mouseenter focusin"
+                        eventOff="mouseleave focusout"
+                        aria-haspopup='true'
+                        role='tooltip'/>
           <div className={styles.closeIcon}>
             {
               ((this.props.chatID == 'public') ?
@@ -58,10 +70,13 @@ class Chat extends Component {
                 <Link
                   to="/users"
                   role="button"
-                  aria-label={intl.formatMessage(intlMessages.closeChatLabel, { title: title })}>
+                  aria-label={intl.formatMessage(intlMessages.closeChatLabel, { title: title })}
+                  data-tip={'Close Chat'}
+                  data-for={'CloseChat'}>
                     <Icon iconName="close" onClick={() => actions.handleClosePrivateChat(chatID)}/>
                 </Link>)
             }
+
           </div>
         </header>
 

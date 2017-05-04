@@ -15,6 +15,8 @@ import DropdownListItem from '/imports/ui/components/dropdown/list/item/componen
 import { withModalMounter } from '/imports/ui/components/modal/service';
 import { defineMessages, injectIntl } from 'react-intl';
 
+import ReactTooltip from 'react-tooltip';
+
 const intlMessages = defineMessages({
   toggleUserListLabel: {
     id: 'app.navBar.userListToggleBtnLabel',
@@ -50,6 +52,7 @@ class NavBar extends Component {
     this.state = {
       isActionsOpen: false,
       didSendBreakoutInvite: false,
+      isOpenTooltip: false,
     };
 
     this.handleToggleUserList = this.handleToggleUserList.bind(this);
@@ -57,6 +60,11 @@ class NavBar extends Component {
 
   componendDidMount() {
     document.title = this.props.presentationTitle;
+    ReactTooltip.rebuild();
+  }
+
+  componentDidUpdate() {
+    ReactTooltip.rebuild();
   }
 
   handleToggleUserList() {
@@ -73,8 +81,16 @@ class NavBar extends Component {
     });
   }
 
+  hideTooltip() {
+    let delayHide = 0;
+
+  }
+
   render() {
     const { hasUnreadMessages, beingRecorded, isExpanded, intl } = this.props;
+
+    let disableTooltip;
+    disableTooltip = navigator.userAgent.indexOf('Mobile') == -1 ? false : true;
 
     let toggleBtnClasses = {};
     toggleBtnClasses[styles.btn] = true;
@@ -93,18 +109,31 @@ class NavBar extends Component {
             className={cx(toggleBtnClasses)}
             aria-expanded={isExpanded}
             aria-describedby="newMessage"
+            data-tip="UserToggleList"
+            data-for="newMessage"
           />
+          <ReactTooltip id='newMessage'
+                        place="right"
+                        type="light"
+                        effect="solid"
+                        disable={disableTooltip}
+                        event="mouseenter focusin"
+                        eventOff="mouseleave focusout"
+                        aria-haspopup="true"
+                        role='tooltip'/>
           <div
             id="newMessage"
             aria-label={hasUnreadMessages ? intl.formatMessage(intlMessages.newMessages) : null}/>
+
         </div>
         <div className={styles.center} role="banner">
           {this.renderPresentationTitle()}
           <RecordingIndicator beingRecorded={beingRecorded}/>
         </div>
-        <div className={styles.right}>
-          <SettingsDropdownContainer />
+        <div className={styles.right} ref="tooltip">
+            <SettingsDropdownContainer/>
         </div>
+        <ReactTooltip id="option"/>
       </div>
     );
   }

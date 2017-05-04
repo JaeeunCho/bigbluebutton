@@ -3,6 +3,7 @@ import ModalBase from '../../modal/base/component';
 import styles from './styles.scss';
 import JoinAudio from '../join-audio/component';
 import AudioSettings from '../audio-settings/component';
+import ReactTooltip from 'react-tooltip';
 
 export default class AudioModal extends React.Component {
   constructor(props) {

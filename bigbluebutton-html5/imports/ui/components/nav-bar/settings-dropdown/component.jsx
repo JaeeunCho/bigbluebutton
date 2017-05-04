@@ -17,6 +17,8 @@ import DropdownList from '/imports/ui/components/dropdown/list/component';
 import DropdownListItem from '/imports/ui/components/dropdown/list/item/component';
 import DropdownListSeparator from '/imports/ui/components/dropdown/list/separator/component';
 
+import ReactTooltip from 'react-tooltip';
+
 const intlMessages = defineMessages({
   optionsLabel: {
     id: 'app.navBar.settingsDropdown.optionsLabel',
@@ -67,6 +69,16 @@ const intlMessages = defineMessages({
 class SettingsDropdown extends Component {
   constructor(props) {
     super(props);
+
+    ReactTooltip.rebuild = ReactTooltip.rebuild.bind(this);
+  }
+
+  componentDidUpdate() {
+    ReactTooltip.rebuild();
+  }
+
+  componentDidMount() {
+    ReactTooltip.rebuild();
   }
 
   render() {
@@ -82,6 +94,9 @@ class SettingsDropdown extends Component {
       fullScreenIcon = 'exit_fullscreen';
     }
 
+    let disableTooltip;
+    disableTooltip = navigator.userAgent.indexOf('Mobile') == -1 ? false : true;
+
     return (
       <Dropdown ref="dropdown">
         <DropdownTrigger>
@@ -96,6 +111,11 @@ class SettingsDropdown extends Component {
             // FIXME: Without onClick react proptypes keep warning
             // even after the DropdownTrigger inject an onClick handler
             onClick={() => null}
+            data-tip='option'
+            data-for="option"
+            data-place="left"
+            data-event={"focusin mouseenter"}
+            data-event-off={"focusout mouseleave"}
           />
         </DropdownTrigger>
         <DropdownContent placement="bottom right">

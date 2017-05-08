@@ -15,6 +15,7 @@ import DropdownListItem from '/imports/ui/components/dropdown/list/item/componen
 import { withModalMounter } from '/imports/ui/components/modal/service';
 import { defineMessages, injectIntl } from 'react-intl';
 
+import Tooltip from '/imports/ui/components/tooltip/component';
 import ReactTooltip from 'react-tooltip';
 
 const intlMessages = defineMessages({
@@ -58,13 +59,8 @@ class NavBar extends Component {
     this.handleToggleUserList = this.handleToggleUserList.bind(this);
   }
 
-  componendDidMount() {
+  componentDidMount() {
     document.title = this.props.presentationTitle;
-    ReactTooltip.rebuild();
-  }
-
-  componentDidUpdate() {
-    ReactTooltip.rebuild();
   }
 
   handleToggleUserList() {
@@ -79,11 +75,6 @@ class NavBar extends Component {
     this.setState({ didSendBreakoutInvite: true }, () => {
       openBreakoutJoinConfirmation.call(this, breakoutURL, breakout.name, mountModal);
     });
-  }
-
-  hideTooltip() {
-    let delayHide = 0;
-
   }
 
   render() {
@@ -112,15 +103,15 @@ class NavBar extends Component {
             data-tip="UserToggleList"
             data-for="newMessage"
           />
-          <ReactTooltip id='newMessage'
-                        place="right"
-                        type="light"
-                        effect="solid"
-                        disable={disableTooltip}
+          <ReactTooltip id={'newMessage'}
                         event="mouseenter focusin"
                         eventOff="mouseleave focusout"
-                        aria-haspopup="true"
-                        role='tooltip'/>
+                        place="right"
+                        effect="solid"
+                        disable={disableTooltip}
+                        aria-haspopup='true'
+                        role='tooltip'
+          />
           <div
             id="newMessage"
             aria-label={hasUnreadMessages ? intl.formatMessage(intlMessages.newMessages) : null}/>
@@ -130,10 +121,20 @@ class NavBar extends Component {
           {this.renderPresentationTitle()}
           <RecordingIndicator beingRecorded={beingRecorded}/>
         </div>
-        <div className={styles.right} ref="tooltip">
-            <SettingsDropdownContainer/>
+        <div className={styles.right}>
+          <div>
+            <SettingsDropdownContainer />
+            <ReactTooltip id={'option'}
+                          event="mouseenter focusin"
+                          eventOff="mouseleave focusout"
+                          place="left"
+                          effect="solid"
+                          disable={disableTooltip}
+                          aria-haspopup='true'
+                          role='tooltip'
+            />
+          </div>
         </div>
-        <ReactTooltip id="option"/>
       </div>
     );
   }

@@ -18,6 +18,7 @@ import DropdownListItem from '/imports/ui/components/dropdown/list/item/componen
 import DropdownListSeparator from '/imports/ui/components/dropdown/list/separator/component';
 
 import ReactTooltip from 'react-tooltip';
+import Tooltip from '/imports/ui/components/tooltip/component';
 
 const intlMessages = defineMessages({
   optionsLabel: {
@@ -70,15 +71,24 @@ class SettingsDropdown extends Component {
   constructor(props) {
     super(props);
 
-    ReactTooltip.rebuild = ReactTooltip.rebuild.bind(this);
+    this.state = {
+      isActionsOpen: false,
+    };
+
+    this.onActionsShow = this.onActionsShow.bind(this);
+    this.onActionsHide = this.onActionsHide.bind(this);
   }
 
-  componentDidUpdate() {
-    ReactTooltip.rebuild();
+  onActionsShow() {
+    this.setState({
+      isActionsOpen: true,
+    });
   }
 
-  componentDidMount() {
-    ReactTooltip.rebuild();
+  onActionsHide() {
+    this.setState({
+      isActionsOpen: false,
+    });
   }
 
   render() {
@@ -97,26 +107,31 @@ class SettingsDropdown extends Component {
     let disableTooltip;
     disableTooltip = navigator.userAgent.indexOf('Mobile') == -1 ? false : true;
 
-    return (
-      <Dropdown ref="dropdown">
-        <DropdownTrigger>
-          <Button
-            label={intl.formatMessage(intlMessages.optionsLabel)}
-            icon="more"
-            ghost={true}
-            circle={true}
-            hideLabel={true}
-            className={cx(styles.btn, styles.btnSettings)}
+    let contents = (
+      <Button
+        label={intl.formatMessage(intlMessages.optionsLabel)}
+        icon="more"
+        ghost={true}
+        circle={true}
+        hideLabel={true}
+        className={cx(styles.btn, styles.btnSettings)}
+        tabIndex={0}
+        // FIXME: Without onClick react proptypes keep warning
+        // even after the DropdownTrigger inject an onClick handler
+        onClick={() => null}
+        data-tip="option"
+        data-for="option"
+      />
+    );
 
-            // FIXME: Without onClick react proptypes keep warning
-            // even after the DropdownTrigger inject an onClick handler
-            onClick={() => null}
-            data-tip='option'
-            data-for="option"
-            data-place="left"
-            data-event={"focusin mouseenter"}
-            data-event-off={"focusout mouseleave"}
-          />
+    return (
+      <Dropdown ref="dropdown"
+          isOpen={this.state.isActionsOpen}
+          onShow={this.onActionsShow}
+          onHide={this.onActionsHide}
+      >
+        <DropdownTrigger>
+          {contents}
         </DropdownTrigger>
         <DropdownContent placement="bottom right">
           <DropdownList>

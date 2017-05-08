@@ -10,6 +10,7 @@ import cx from 'classnames';
 import _ from 'lodash';
 
 import ReactTooltip from 'react-tooltip';
+import Tooltip from '/imports/ui/components/tooltip/component';
 
 import Dropdown from '/imports/ui/components/dropdown/component';
 import DropdownTrigger from '/imports/ui/components/dropdown/trigger/component';

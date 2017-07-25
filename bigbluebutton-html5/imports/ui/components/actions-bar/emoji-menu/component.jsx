@@ -64,17 +64,66 @@ class EmojiMenu extends Component {
               tabIndex={-1}
             />
             <DropdownListItem
+              icon="applause"
+              label={intl.formatMessage(intlMessages.applauseLabel)}
+              description={intl.formatMessage(intlMessages.applauseDesc)}
+              onClick={() => actions.setEmojiHandler('applause')}
+              tabIndex={-1}
+            />
+            <DropdownListItem
+              icon="thumbs_up"
+              label={intl.formatMessage(intlMessages.thumbsupLabel)}
+              description={intl.formatMessage(intlMessages.thumbsupDesc)}
+              onClick={() => actions.setEmojiHandler('agree')}
+              tabIndex={-1}
+            />
+            <DropdownListItem
+              icon="thumbs_down"
+              label={intl.formatMessage(intlMessages.thumbsdownLabel)}
+              description={intl.formatMessage(intlMessages.thumbsdownDesc)}
+              onClick={() => actions.setEmojiHandler('disagree')}
+              tabIndex={-1}
+            />
+            <DropdownListItem
+              icon="speak_faster"
+              label={intl.formatMessage(intlMessages.speakFasterLabel)}
+              description={intl.formatMessage(intlMessages.speakFasterDesc)}
+              onClick={() => actions.setEmojiHandler('speakFaster')}
+              tabIndex={-1}
+            />
+            <DropdownListItem
+              icon="speak_slower"
+              label={intl.formatMessage(intlMessages.speakSlowerLabel)}
+              description={intl.formatMessage(intlMessages.speakSlowerDesc)}
+              onClick={() => actions.setEmojiHandler('speakSlower')}
+              tabIndex={-1}
+            />
+            <DropdownListItem
+              icon="speak_louder"
+              label={intl.formatMessage(intlMessages.speakLouderLabel)}
+              description={intl.formatMessage(intlMessages.speakLouderDesc)}
+              onClick={() => actions.setEmojiHandler('speakLouder')}
+              tabIndex={-1}
+            />
+            <DropdownListItem
+              icon="speak_softer"
+              label={intl.formatMessage(intlMessages.speakSofterLabel)}
+              description={intl.formatMessage(intlMessages.speakSofterDesc)}
+              onClick={() => actions.setEmojiHandler('speakSofter')}
+              tabIndex={-1}
+            />
+            <DropdownListItem
+              icon="time"
+              label={intl.formatMessage(intlMessages.awayLabel)}
+              description={intl.formatMessage(intlMessages.awayDesc)}
+              onClick={() => actions.setEmojiHandler('beRightBack')}
+              tabIndex={-1}
+            />
+            <DropdownListItem
               icon="happy"
               label={intl.formatMessage(intlMessages.happyLabel)}
               description={intl.formatMessage(intlMessages.happyDesc)}
               onClick={() => actions.setEmojiHandler('happy')}
-              tabIndex={-1}
-            />
-            <DropdownListItem
-              icon="undecided"
-              label={intl.formatMessage(intlMessages.undecidedLabel)}
-              description={intl.formatMessage(intlMessages.undecidedDesc)}
-              onClick={() => actions.setEmojiHandler('neutral')}
               tabIndex={-1}
             />
             <DropdownListItem
@@ -92,31 +141,10 @@ class EmojiMenu extends Component {
               tabIndex={-1}
             />
             <DropdownListItem
-              icon="time"
-              label={intl.formatMessage(intlMessages.awayLabel)}
-              description={intl.formatMessage(intlMessages.awayDesc)}
-              onClick={() => actions.setEmojiHandler('away')}
-              tabIndex={-1}
-            />
-            <DropdownListItem
-              icon="thumbs_up"
-              label={intl.formatMessage(intlMessages.thumbsupLabel)}
-              description={intl.formatMessage(intlMessages.thumbsupDesc)}
-              onClick={() => actions.setEmojiHandler('thumbsUp')}
-              tabIndex={-1}
-            />
-            <DropdownListItem
-              icon="thumbs_down"
-              label={intl.formatMessage(intlMessages.thumbsdownLabel)}
-              description={intl.formatMessage(intlMessages.thumbsdownDesc)}
-              onClick={() => actions.setEmojiHandler('thumbsDown')}
-              tabIndex={-1}
-            />
-            <DropdownListItem
-              icon="applause"
-              label={intl.formatMessage(intlMessages.applauseLabel)}
-              description={intl.formatMessage(intlMessages.applauseDesc)}
-              onClick={() => actions.setEmojiHandler('applause')}
+              icon="undecided"
+              label={intl.formatMessage(intlMessages.undecidedLabel)}
+              description={intl.formatMessage(intlMessages.undecidedDesc)}
+              onClick={() => actions.setEmojiHandler('neutral')}
               tabIndex={-1}
             />
             <DropdownListSeparator />
@@ -205,19 +233,51 @@ const intlMessages = defineMessages({
   },
   thumbsupLabel: {
     id: 'app.actionsBar.emojiMenu.thumbsupLabel',
-    description: 'thumbs up emoji label',
+    description: 'agree emoji label',
   },
   thumbsupDesc: {
     id: 'app.actionsBar.emojiMenu.thumbsupDesc',
-    description: 'adds context to thumbs up option',
+    description: 'adds context to agree option',
   },
   thumbsdownLabel: {
     id: 'app.actionsBar.emojiMenu.thumbsdownLabel',
-    description: 'thumbs down emoji label',
+    description: 'disagree emoji label',
   },
   thumbsdownDesc: {
     id: 'app.actionsBar.emojiMenu.thumbsdownDesc',
-    description: 'adds context to thumbs down option',
+    description: 'adds context to disagree option',
+  },
+  speakFasterLabel: {
+    id: 'app.actionsBar.emojiMenu.speakFasterLabel',
+    description: 'speak faster emoji label',
+  },
+  speakFasterDesc: {
+    id: 'app.actionsBar.emojiMenu.speakFasterDesc',
+    description: 'adds context to speak faster option',
+  },
+  speakSlowerLabel: {
+    id: 'app.actionsBar.emojiMenu.speakSlowerLabel',
+    description: 'speak slower emoji label',
+  },
+  speakSlowerDesc: {
+    id: 'app.actionsBar.emojiMenu.speakSlowerDesc',
+    description: 'adds context to speak slower option',
+  },
+  speakLouderLabel: {
+    id: 'app.actionsBar.emojiMenu.speakLouderLabel',
+    description: 'speak louder emoji label',
+  },
+  speakLouderDesc: {
+    id: 'app.actionsBar.emojiMenu.speakLouderDesc',
+    description: 'adds context to speak louder option',
+  },
+  speakSofterLabel: {
+    id: 'app.actionsBar.emojiMenu.speakSofterLabel',
+    description: 'speak softer emoji label',
+  },
+  speakSofterDesc: {
+    id: 'app.actionsBar.emojiMenu.speakSofterDesc',
+    description: 'adds context to speak softer option',
   },
   changeStatusLabel: {
     id: 'app.actionsBar.changeStatusLabel',

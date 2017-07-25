@@ -55,10 +55,10 @@ export default class UserAvatar extends Component {
       let iconEmoji;
 
       switch (user.emoji.status) {
-        case 'thumbsUp':
+        case 'agree':
           iconEmoji = 'thumbs_up';
           break;
-        case 'thumbsDown':
+        case 'disagree':
           iconEmoji = 'thumbs_down';
           break;
         case 'raiseHand':

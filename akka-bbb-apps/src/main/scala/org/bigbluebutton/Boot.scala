@@ -7,7 +7,7 @@ import org.bigbluebutton.core._
 import org.bigbluebutton.core.pubsub.receivers.RedisMessageReceiver
 import org.bigbluebutton.core.bus._
 import org.bigbluebutton.core.pubsub.senders.ReceivedJsonMsgHandlerActor
-import org.bigbluebutton.core2.FromAkkaAppsMsgSenderActor
+import org.bigbluebutton.core2.{ AnalyticsActor, FromAkkaAppsMsgSenderActor }
 
 object Boot extends App with SystemConfiguration {
 
@@ -17,29 +17,28 @@ object Boot extends App with SystemConfiguration {
 
   val eventBus = new InMsgBusGW(new IncomingEventBusImp())
 
-  val outgoingEventBus = new OutgoingEventBus
   val outBus2 = new OutEventBus2
   val recordingEventBus = new RecordingEventBus
 
-  val outGW = new OutMessageGatewayImp(outgoingEventBus, outBus2, recordingEventBus)
+  val outGW = new OutMessageGatewayImp(outBus2)
 
   val redisPublisher = new RedisPublisher(system)
   val msgSender = new MessageSender(redisPublisher)
 
   val redisRecorderActor = system.actorOf(RedisRecorderActor.props(system), "redisRecorderActor")
 
-  val messageSenderActor = system.actorOf(MessageSenderActor.props(msgSender), "messageSenderActor")
-
-  outgoingEventBus.subscribe(messageSenderActor, outMessageChannel)
-
-  outgoingEventBus.subscribe(redisRecorderActor, outMessageChannel)
+  recordingEventBus.subscribe(redisRecorderActor, outMessageChannel)
   val incomingJsonMessageBus = new IncomingJsonMessageBus
 
   val bbbMsgBus = new BbbMsgRouterEventBus
 
   val fromAkkaAppsMsgSenderActorRef = system.actorOf(FromAkkaAppsMsgSenderActor.props(msgSender))
+  val analyticsActorRef = system.actorOf(AnalyticsActor.props())
   outBus2.subscribe(fromAkkaAppsMsgSenderActorRef, outBbbMsgMsgChannel)
   outBus2.subscribe(redisRecorderActor, recordServiceMessageChannel)
+
+  outBus2.subscribe(analyticsActorRef, outBbbMsgMsgChannel)
+  bbbMsgBus.subscribe(analyticsActorRef, analyticsChannel)
 
   val bbbInGW = new BigBlueButtonInGW(system, eventBus, bbbMsgBus, outGW)
   val redisMsgReceiver = new RedisMessageReceiver(bbbInGW)

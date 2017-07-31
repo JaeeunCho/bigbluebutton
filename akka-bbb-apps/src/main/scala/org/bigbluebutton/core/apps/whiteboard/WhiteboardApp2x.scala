@@ -1,8 +1,6 @@
 package org.bigbluebutton.core.apps.whiteboard
 
-import org.bigbluebutton.core.api._
-import org.bigbluebutton.core.OutMessageGateway
-import org.bigbluebutton.core.running.{ MeetingActor }
+import org.bigbluebutton.core.running.{ MeetingActor, OutMsgRouter }
 import org.bigbluebutton.common2.msgs.AnnotationVO
 import org.bigbluebutton.core.apps.WhiteboardKeyUtil
 
@@ -15,10 +13,11 @@ trait WhiteboardApp2x
     with ModifyWhiteboardAccessPubMsgHdlr
     with GetWhiteboardAccessReqMsgHdlr
     with SendWhiteboardAnnotationPubMsgHdlr
+    with SyncWhiteboardAccessRespMsgHdlr
     with GetWhiteboardAnnotationsReqMsgHdlr {
   this: MeetingActor =>
 
-  val outGW: OutMessageGateway
+  val outGW: OutMsgRouter
 
   def sendWhiteboardAnnotation(annotation: AnnotationVO): AnnotationVO = {
     //    println("Received whiteboard annotation. status=[" + status + "], annotationType=[" + annotationType + "]")

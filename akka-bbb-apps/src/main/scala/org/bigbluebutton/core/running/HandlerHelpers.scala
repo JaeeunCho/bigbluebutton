@@ -2,17 +2,16 @@ package org.bigbluebutton.core.running
 
 import org.bigbluebutton.SystemConfiguration
 import org.bigbluebutton.common2.msgs._
-import org.bigbluebutton.core.api.{ BreakoutRoomEndedInternalMsg, DestroyMeetingInternalMsg, RecordingStatusChanged }
-import org.bigbluebutton.core.bus.{ BigBlueButtonEvent, IncomingEventBus }
-import org.bigbluebutton.core.domain.{ MeetingExpiryTracker, MeetingState2x }
-import org.bigbluebutton.core.OutMessageGateway
+import org.bigbluebutton.core.api.{ BreakoutRoomEndedInternalMsg, DestroyMeetingInternalMsg }
+import org.bigbluebutton.core.bus.{ BigBlueButtonEvent, InternalEventBus }
+import org.bigbluebutton.core.domain.{ MeetingState2x }
 import org.bigbluebutton.core.models._
 import org.bigbluebutton.core2.MeetingStatus2x
-import org.bigbluebutton.core2.message.senders.{ MsgBuilder, Sender, UserJoinedMeetingEvtMsgBuilder }
+import org.bigbluebutton.core2.message.senders.{ MsgBuilder, UserJoinedMeetingEvtMsgBuilder }
 
 trait HandlerHelpers extends SystemConfiguration {
 
-  def sendAllWebcamStreams(outGW: OutMessageGateway, requesterId: String, webcams: Webcams, meetingId: String): Unit = {
+  def sendAllWebcamStreams(outGW: OutMsgRouter, requesterId: String, webcams: Webcams, meetingId: String): Unit = {
     val streams = org.bigbluebutton.core.models.Webcams.findAll(webcams)
     val webcamStreams = streams.map { u =>
       val msVO = MediaStreamVO(id = u.stream.id, url = u.stream.url, userId = u.stream.userId,
@@ -22,10 +21,10 @@ trait HandlerHelpers extends SystemConfiguration {
     }
 
     val event = MsgBuilder.buildGetWebcamStreamsMeetingRespMsg(meetingId, requesterId, webcamStreams)
-    Sender.send(outGW, event)
+    outGW.send(event)
   }
 
-  def userJoinMeeting(outGW: OutMessageGateway, authToken: String,
+  def userJoinMeeting(outGW: OutMsgRouter, authToken: String,
                       liveMeeting: LiveMeeting, state: MeetingState2x): MeetingState2x = {
     val nu = for {
       regUser <- RegisteredUsers.findWithToken(authToken, liveMeeting.registeredUsers)
@@ -50,31 +49,43 @@ trait HandlerHelpers extends SystemConfiguration {
         Users2x.add(liveMeeting.users2x, newUser)
 
         val event = UserJoinedMeetingEvtMsgBuilder.build(liveMeeting.props.meetingProp.intId, newUser)
-        Sender.send(outGW, event)
-        startRecordingIfAutoStart2x(liveMeeting)
-
-        if (!state.expiryTracker.userHasJoined) {
-          MeetingExpiryTracker.setUserHasJoined(state)
-        } else {
-          state
+        outGW.send(event)
+        startRecordingIfAutoStart2x(outGW, liveMeeting)
+        if (!Users2x.hasPresenter(liveMeeting.users2x)) {
+          automaticallyAssignPresenter(outGW, liveMeeting)
         }
-
+        state.update(state.expiryTracker.setUserHasJoined())
       case None =>
         state
     }
   }
 
-  def startRecordingIfAutoStart2x(liveMeeting: LiveMeeting): Unit = {
+  def startRecordingIfAutoStart2x(outGW: OutMsgRouter, liveMeeting: LiveMeeting): Unit = {
     if (liveMeeting.props.recordProp.record && !MeetingStatus2x.isRecording(liveMeeting.status) &&
       liveMeeting.props.recordProp.autoStartRecording && Users2x.numUsers(liveMeeting.users2x) == 1) {
 
       MeetingStatus2x.recordingStarted(liveMeeting.status)
-      //     outGW.send(new RecordingStatusChanged(props.meetingProp.intId, props.recordProp.record,
-      //       "system", MeetingStatus2x.isRecording(liveMeeting.status)))
+
+      def buildRecordingStatusChangedEvtMsg(meetingId: String, userId: String, recording: Boolean): BbbCommonEnvCoreMsg = {
+        val routing = Routing.addMsgToClientRouting(MessageTypes.BROADCAST_TO_MEETING, meetingId, userId)
+        val envelope = BbbCoreEnvelope(RecordingStatusChangedEvtMsg.NAME, routing)
+        val body = RecordingStatusChangedEvtMsgBody(recording, userId)
+        val header = BbbClientMsgHeader(RecordingStatusChangedEvtMsg.NAME, meetingId, userId)
+        val event = RecordingStatusChangedEvtMsg(header, body)
+
+        BbbCommonEnvCoreMsg(envelope, event)
+      }
+
+      val event = buildRecordingStatusChangedEvtMsg(
+        liveMeeting.props.meetingProp.intId,
+        "system", MeetingStatus2x.isRecording(liveMeeting.status)
+      )
+      outGW.send(event)
+
     }
   }
 
-  def automaticallyAssignPresenter(outGW: OutMessageGateway, liveMeeting: LiveMeeting): Unit = {
+  def automaticallyAssignPresenter(outGW: OutMsgRouter, liveMeeting: LiveMeeting): Unit = {
     val meetingId = liveMeeting.props.meetingProp.intId
     for {
       moderator <- Users2x.findModerator(liveMeeting.users2x)
@@ -84,12 +95,12 @@ trait HandlerHelpers extends SystemConfiguration {
     }
   }
 
-  def sendPresenterAssigned(outGW: OutMessageGateway, meetingId: String, intId: String, name: String, assignedBy: String): Unit = {
+  def sendPresenterAssigned(outGW: OutMsgRouter, meetingId: String, intId: String, name: String, assignedBy: String): Unit = {
     def event = MsgBuilder.buildPresenterAssignedEvtMsg(meetingId, intId, name, assignedBy)
     outGW.send(event)
   }
 
-  def endMeeting(outGW: OutMessageGateway, liveMeeting: LiveMeeting, reason: String): Unit = {
+  def endMeeting(outGW: OutMsgRouter, liveMeeting: LiveMeeting, reason: String): Unit = {
     def buildMeetingEndingEvtMsg(meetingId: String): BbbCommonEnvCoreMsg = {
       val routing = Routing.addMsgToClientRouting(MessageTypes.BROADCAST_TO_MEETING, meetingId, "not-used")
       val envelope = BbbCoreEnvelope(MeetingEndingEvtMsg.NAME, routing)
@@ -121,11 +132,11 @@ trait HandlerHelpers extends SystemConfiguration {
     outGW.send(endedEvnt)
   }
 
-  def destroyMeeting(eventBus: IncomingEventBus, meetingId: String): Unit = {
+  def destroyMeeting(eventBus: InternalEventBus, meetingId: String): Unit = {
     eventBus.publish(BigBlueButtonEvent(meetingManagerChannel, new DestroyMeetingInternalMsg(meetingId)))
   }
 
-  def notifyParentThatBreakoutEnded(eventBus: IncomingEventBus, liveMeeting: LiveMeeting): Unit = {
+  def notifyParentThatBreakoutEnded(eventBus: InternalEventBus, liveMeeting: LiveMeeting): Unit = {
     if (liveMeeting.props.meetingProp.isBreakout) {
       eventBus.publish(BigBlueButtonEvent(
         liveMeeting.props.breakoutProps.parentId,
@@ -134,19 +145,19 @@ trait HandlerHelpers extends SystemConfiguration {
     }
   }
 
-  def ejectAllUsersFromVoiceConf(outGW: OutMessageGateway, liveMeeting: LiveMeeting): Unit = {
+  def ejectAllUsersFromVoiceConf(outGW: OutMsgRouter, liveMeeting: LiveMeeting): Unit = {
     val event = MsgBuilder.buildEjectAllFromVoiceConfMsg(liveMeeting.props.meetingProp.intId, liveMeeting.props.voiceProp.voiceConf)
     outGW.send(event)
   }
 
-  def sendEndMeetingDueToExpiry(reason: String, eventBus: IncomingEventBus, outGW: OutMessageGateway, liveMeeting: LiveMeeting): Unit = {
+  def sendEndMeetingDueToExpiry(reason: String, eventBus: InternalEventBus, outGW: OutMsgRouter, liveMeeting: LiveMeeting): Unit = {
     endMeeting(outGW, liveMeeting, reason)
     notifyParentThatBreakoutEnded(eventBus, liveMeeting)
     ejectAllUsersFromVoiceConf(outGW, liveMeeting)
     destroyMeeting(eventBus, liveMeeting.props.meetingProp.intId)
   }
 
-  def sendEndMeetingDueToExpiry2(reason: String, eventBus: IncomingEventBus, outGW: OutMessageGateway, liveMeeting: LiveMeeting): Unit = {
+  def sendEndMeetingDueToExpiry2(reason: String, eventBus: InternalEventBus, outGW: OutMsgRouter, liveMeeting: LiveMeeting): Unit = {
     val meetingId = liveMeeting.props.meetingProp.intId
 
     val endMeetingEvt = buildMeetingEndingEvtMsg(reason, meetingId)

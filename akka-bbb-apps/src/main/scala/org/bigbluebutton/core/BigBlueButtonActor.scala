@@ -21,7 +21,7 @@ import org.bigbluebutton.core2.message.senders.MsgBuilder
 object BigBlueButtonActor extends SystemConfiguration {
   def props(
     system:    ActorSystem,
-    eventBus:  IncomingEventBus,
+    eventBus:  InternalEventBus,
     bbbMsgBus: BbbMsgRouterEventBus,
     outGW:     OutMessageGateway
   ): Props =
@@ -30,7 +30,7 @@ object BigBlueButtonActor extends SystemConfiguration {
 
 class BigBlueButtonActor(
   val system:   ActorSystem,
-  val eventBus: IncomingEventBus, val bbbMsgBus: BbbMsgRouterEventBus,
+  val eventBus: InternalEventBus, val bbbMsgBus: BbbMsgRouterEventBus,
   val outGW: OutMessageGateway
 ) extends Actor
     with ActorLogging with SystemConfiguration {
@@ -109,7 +109,7 @@ class BigBlueButtonActor(
 
         // Send new 2x message
         val msgEvent = MsgBuilder.buildMeetingCreatedEvtMsg(m.props.meetingProp.intId, msg.body.props)
-        outGW.send(msgEvent)
+        m.outMsgRouter.send(msgEvent)
 
       case Some(m) =>
         log.info("Meeting already created. meetingID={}", msg.body.props.meetingProp.intId)
@@ -150,12 +150,15 @@ class BigBlueButtonActor(
       context.system.scheduler.scheduleOnce(Duration.create(2500, TimeUnit.MILLISECONDS)) {
         // Disconnect all clients
 
-        val disconnectEvnt = MsgBuilder.buildDisconnectAllClientsSysMsg(msg.meetingId)
-        outGW.send(disconnectEvnt)
+        val disconnectEvnt = MsgBuilder.buildDisconnectAllClientsSysMsg(msg.meetingId, "meeting-destroyed")
+        m2.outMsgRouter.send(disconnectEvnt)
+
+        val stopTranscodersCmd = MsgBuilder.buildStopMeetingTranscodersSysCmdMsg(msg.meetingId)
+        m2.outMsgRouter.send(stopTranscodersCmd)
 
         log.info("Destroyed meetingId={}", msg.meetingId)
         val destroyedEvent = MsgBuilder.buildMeetingDestroyedEvtMsg(msg.meetingId)
-        outGW.send(destroyedEvent)
+        m2.outMsgRouter.send(destroyedEvent)
 
         // Stop the meeting actor.
         context.stop(m.actorRef)

@@ -1,15 +1,19 @@
 package org.bigbluebutton.core.apps.screenshare
 
-import org.bigbluebutton.core.OutMessageGateway
 import org.bigbluebutton.common2.msgs._
 import org.bigbluebutton.core.apps.ScreenshareModel
+import org.bigbluebutton.core.running.OutMsgRouter
 
 trait ScreenshareStoppedVoiceConfEvtMsgHdlr {
   this: ScreenshareApp2x =>
 
-  val outGW: OutMessageGateway
+  val outGW: OutMsgRouter
 
   def handleScreenshareStoppedVoiceConfEvtMsg(msg: ScreenshareStoppedVoiceConfEvtMsg): Unit = {
+    handleScreenshareStoppedVoiceConfEvtMsg(msg.body.voiceConf, msg.body.screenshareConf)
+  }
+
+  def handleScreenshareStoppedVoiceConfEvtMsg(voiceConf: String, screenshareConf: String): Unit = {
 
     def broadcastEvent(voiceConf: String, screenshareConf: String, url: String, timestamp: String): BbbCommonEnvCoreMsg = {
       val routing = collection.immutable.HashMap("sender" -> "bbb-apps-akka")
@@ -24,14 +28,14 @@ trait ScreenshareStoppedVoiceConfEvtMsgHdlr {
       BbbCommonEnvCoreMsg(envelope, event)
     }
 
+    val broadcastUrl = ScreenshareModel.getRTMPBroadcastingUrl(liveMeeting.screenshareModel)
     log.info("handleScreenshareStoppedRequest: dsStarted=" +
       ScreenshareModel.getScreenshareStarted(liveMeeting.screenshareModel) +
-      " URL:" + ScreenshareModel.getRTMPBroadcastingUrl(liveMeeting.screenshareModel))
+      " URL:" + broadcastUrl)
 
     val timestamp = System.currentTimeMillis().toString
     // Tell FreeSwitch to stop broadcasting to RTMP
-    val msgEvent = broadcastEvent(msg.body.voiceConf, msg.body.screenshareConf,
-      ScreenshareModel.getRTMPBroadcastingUrl(liveMeeting.screenshareModel), timestamp)
+    val msgEvent = broadcastEvent(voiceConf, screenshareConf, broadcastUrl, timestamp)
     outGW.send(msgEvent)
 
     ScreenshareModel.setScreenshareStarted(liveMeeting.screenshareModel, false)

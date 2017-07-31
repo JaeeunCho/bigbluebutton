@@ -1,15 +1,14 @@
 package org.bigbluebutton.core.apps.voice
 
 import org.bigbluebutton.common2.msgs._
-import org.bigbluebutton.core.OutMessageGateway
 import org.bigbluebutton.core.models.{ VoiceUserState, VoiceUsers }
-import org.bigbluebutton.core.running.{ BaseMeetingActor, LiveMeeting, MeetingActor }
+import org.bigbluebutton.core.running.{ BaseMeetingActor, LiveMeeting, MeetingActor, OutMsgRouter }
 
 trait UserMutedInVoiceConfEvtMsgHdlr {
   this: BaseMeetingActor =>
 
   val liveMeeting: LiveMeeting
-  val outGW: OutMessageGateway
+  val outGW: OutMsgRouter
 
   def handleUserMutedInVoiceConfEvtMsg(msg: UserMutedInVoiceConfEvtMsg): Unit = {
 
@@ -25,7 +24,7 @@ trait UserMutedInVoiceConfEvtMsgHdlr {
         liveMeeting.props.meetingProp.intId, vu.intId
       )
 
-      val body = UserMutedVoiceEvtMsgBody(intId = vu.intId, voiceUserId = vu.intId, vu.muted)
+      val body = UserMutedVoiceEvtMsgBody(voiceConf = msg.header.voiceConf, intId = vu.intId, voiceUserId = vu.intId, vu.muted)
 
       val event = UserMutedVoiceEvtMsg(header, body)
       val msgEvent = BbbCommonEnvCoreMsg(envelope, event)

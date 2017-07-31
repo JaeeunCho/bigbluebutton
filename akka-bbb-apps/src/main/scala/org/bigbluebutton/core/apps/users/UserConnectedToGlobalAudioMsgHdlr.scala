@@ -1,14 +1,13 @@
 package org.bigbluebutton.core.apps.users
 
 import org.bigbluebutton.common2.msgs._
-import org.bigbluebutton.core.OutMessageGateway
 import org.bigbluebutton.core.models.{ Users2x, VoiceUserState, VoiceUsers }
-import org.bigbluebutton.core.running.MeetingActor
+import org.bigbluebutton.core.running.{ MeetingActor, OutMsgRouter }
 
 trait UserConnectedToGlobalAudioMsgHdlr {
   this: MeetingActor =>
 
-  val outGW: OutMessageGateway
+  val outGW: OutMsgRouter
 
   def handleUserConnectedToGlobalAudioMsg(msg: UserConnectedToGlobalAudioMsg) {
     log.info("Handling UserConnectedToGlobalAudio: meetingId=" + props.meetingProp.intId + " userId=" + msg.body.userId)
@@ -19,14 +18,12 @@ trait UserConnectedToGlobalAudioMsgHdlr {
       val envelope = BbbCoreEnvelope(UserJoinedVoiceConfToClientEvtMsg.NAME, routing)
       val header = BbbClientMsgHeader(UserJoinedVoiceConfToClientEvtMsg.NAME, props.meetingProp.intId, vu.intId)
 
-      val body = UserJoinedVoiceConfToClientEvtMsgBody(intId = vu.intId, voiceUserId = vu.intId,
+      val body = UserJoinedVoiceConfToClientEvtMsgBody(voiceConf = msg.header.voiceConf, intId = vu.intId, voiceUserId = vu.intId,
         callingWith = vu.callingWith, callerName = vu.callerName,
         callerNum = vu.callerNum, muted = true, talking = false, listenOnly = true)
       val event = UserJoinedVoiceConfToClientEvtMsg(header, body)
       val msgEvent = BbbCommonEnvCoreMsg(envelope, event)
       outGW.send(msgEvent)
-
-      record(event)
     }
 
     for {

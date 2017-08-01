@@ -67,13 +67,15 @@ class ModalFullscreen extends Component {
               className={styles.dismiss}
               label={dismiss.label}
               onClick={this.handleAction.bind(this, 'dismiss')}
-              aria-describedby={'modalDismissDescription'} />
+              aria-describedby={'modalDismissDescription'}
+            />
             <Button
               color={'primary'}
               className={styles.confirm}
               label={confirm.label}
               onClick={this.handleAction.bind(this, 'confirm')}
-              aria-describedby={'modalConfirmDescription'} />
+              aria-describedby={'modalConfirmDescription'}
+            />
           </div>
         </header>
         <div className={styles.content}>
@@ -83,7 +85,8 @@ class ModalFullscreen extends Component {
               className={styles.others}
               label={others.label}
               onClick={this.handleAction.bind(this, 'others')}
-              aria-describedby={'modalOthersDescription'} />
+              aria-describedby={'modalOthersDescription'}
+            />
               : null
             }
         </div>
@@ -92,7 +95,7 @@ class ModalFullscreen extends Component {
       </ModalBase>
     );
   }
-};
+}
 
 ModalFullscreen.propTypes = propTypes;
 ModalFullscreen.defaultProps = defaultProps;

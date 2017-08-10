@@ -65,7 +65,7 @@ class PresentationToolbar extends Component {
       <div id="presentationToolbarWrapper" className={styles.presentationToolbarWrapper}>
         {this.renderAriaLabelsDescs()}
 
-        {/* Previous Slide button*/}
+        {/* Previous Slide button */}
         <Button
           role="button"
           aria-labelledby="prevSlideLabel"
@@ -79,7 +79,7 @@ class PresentationToolbar extends Component {
           hideLabel
           className={styles.prevSlide}
         />
-        {/* Skip Slide drop down*/}
+        {/* Skip Slide drop down */}
         <select
           id="skipSlide"
           role="listbox"
@@ -93,7 +93,7 @@ class PresentationToolbar extends Component {
         >
           {this.renderSkipSlideOpts(numberOfSlides)}
         </select>
-        {/* Next Slide button*/}
+        {/* Next Slide button */}
         <Button
           role="button"
           aria-labelledby="nextSlideLabel"
@@ -119,7 +119,7 @@ class PresentationToolbar extends Component {
           onClick={this.fitToWidthClickHandler}
           label={'Fit to Width'}
           hideLabel={true}
-        />*/}
+        /> */}
         {/* Fit to screen button
         <Button
           role="button"
@@ -132,7 +132,7 @@ class PresentationToolbar extends Component {
           onClick={this.fitToScreenClickHandler}
           label={'Fit to Screen'}
           hideLabel={true}
-        />*/}
+        /> */}
         {/* Zoom slider
         <div
           className={classNames(styles.zoomWrapper, { [styles.zoomWrapperNoBorder]: true })}
@@ -155,7 +155,7 @@ class PresentationToolbar extends Component {
             className={styles.zoomSlider}
           />
           <div className={styles.zoomMinMax}> 400% </div>
-        </div>*/}
+        </div> */}
       </div>
     );
   }
@@ -163,7 +163,7 @@ class PresentationToolbar extends Component {
   renderAriaLabelsDescs() {
     return (
       <div hidden >
-        {/* Previous Slide button aria*/}
+        {/* Previous Slide button aria */}
         <div id="prevSlideLabel">
           <FormattedMessage
             id="app.presentation.presentationToolbar.prevSlideLabel"
@@ -178,7 +178,7 @@ class PresentationToolbar extends Component {
             defaultMessage="Change the presentation to the previous slide"
           />
         </div>
-        {/* Next Slide button aria*/}
+        {/* Next Slide button aria */}
         <div id="nextSlideLabel">
           <FormattedMessage
             id="app.presentation.presentationToolbar.nextSlideLabel"
@@ -193,7 +193,7 @@ class PresentationToolbar extends Component {
             defaultMessage="Change the presentation to the next slide"
           />
         </div>
-        {/* Skip Slide drop down aria*/}
+        {/* Skip Slide drop down aria */}
         <div id="skipSlideLabel">
           <FormattedMessage
             id="app.presentation.presentationToolbar.skipSlideLabel"
@@ -208,7 +208,7 @@ class PresentationToolbar extends Component {
             defaultMessage="Change the presentation to a specific slide"
           />
         </div>
-        {/* Fit to width button aria*/}
+        {/* Fit to width button aria */}
         <div id="fitWidthLabel">
           <FormattedMessage
             id="app.presentation.presentationToolbar.fitWidthLabel"
@@ -223,7 +223,7 @@ class PresentationToolbar extends Component {
             defaultMessage="Display the whole width of the slide"
           />
         </div>
-        {/* Fit to screen button aria*/}
+        {/* Fit to screen button aria */}
         <div id="fitScreenLabel">
           <FormattedMessage
             id="app.presentation.presentationToolbar.fitScreenLabel"
@@ -238,7 +238,7 @@ class PresentationToolbar extends Component {
             defaultMessage="Display the whole slide"
           />
         </div>
-        {/* Zoom slider aria*/}
+        {/* Zoom slider aria */}
         <div id="zoomLabel">
           <FormattedMessage
             id="app.presentation.presentationToolbar.zoomLabel"
